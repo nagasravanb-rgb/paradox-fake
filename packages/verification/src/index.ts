@@ -147,7 +147,7 @@ export async function runVerification(input: {
   hits = dedupeHits(hits).slice(0, input.config.maxEvidence);
 
   let sources = hits.map(sourceFromHit);
-  const relationships = detectSourceRelationships(sources);
+  let relationships = detectSourceRelationships(sources);
   let evidence = hitsToEvidence(primary, sources, input.config.asOf);
   evidence = markExpired(evidence, input.config.asOf);
   let contradictions = findContradictions(evidence);
@@ -200,7 +200,7 @@ export async function runVerification(input: {
       const added = newHits.filter((h) => !hits.some((x) => x.url === h.url));
       hits = newHits;
       sources = hits.map(sourceFromHit);
-      detectSourceRelationships(sources);
+      relationships = detectSourceRelationships(sources);
       evidence = hitsToEvidence(primary, sources, input.config.asOf);
       evidence = markExpired(evidence, input.config.asOf);
       contradictions = findContradictions(evidence);

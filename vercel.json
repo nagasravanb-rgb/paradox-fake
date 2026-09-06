@@ -1,0 +1,5 @@
+{
+  "buildCommand": "npm run build --workspace=@paradox/web",
+  "outputDirectory": "apps/web/dist",
+  "installCommand": "npm install"
+}

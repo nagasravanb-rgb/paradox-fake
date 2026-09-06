@@ -20,12 +20,40 @@ export function lexicalContradiction(claim: string, passage: string): number {
 
 export function evidenceStrength(items: Evidence[]): number {
   if (!items.length) return 0;
-  const active = items.filter((e) => e.evidenceStatus !== "NONE" && e.evidenceStatus !== "EXPIRED");
-  if (!active.length) return 0;
-  const weighted = active.map(
-    (e) => e.relevanceScore * e.sourceReliability * e.independenceScore * (0.5 + 0.5 * e.supportScore),
+
+  const active = items.filter(
+    (e) => e.evidenceStatus !== "NONE" && e.evidenceStatus !== "EXPIRED",
   );
-  const mean = weighted.reduce((a, b) => a + b, 0) / active.length;
-  const diversity = Math.min(1, new Set(active.map((e) => e.sourceId)).size / 3);
+
+  if (!active.length) return 0;
+
+  const relevant = active.filter((e) => e.relevanceScore >= 0.25);
+
+  if (!relevant.length) return 0;
+
+  const relevanceWeight = relevant.reduce(
+    (sum, e) => sum + e.relevanceScore,
+    0,
+  );
+
+  if (relevanceWeight <= 0) return 0;
+
+  const weightedQuality = relevant.reduce(
+    (sum, e) =>
+      sum +
+      e.relevanceScore *
+        e.sourceReliability *
+        e.independenceScore *
+        e.supportScore,
+    0,
+  );
+
+  const mean = weightedQuality / relevanceWeight;
+
+  const diversity = Math.min(
+    1,
+    new Set(relevant.map((e) => e.sourceId)).size / 3,
+  );
+
   return clamp01(0.7 * mean + 0.3 * diversity);
 }

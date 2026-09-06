@@ -263,8 +263,8 @@ function loadDotEnv() {
   }
 }
 
-const port = Number(process.env.PARADOX_API_PORT ?? 8787);
-const host = process.env.PARADOX_API_HOST ?? "127.0.0.1";
+const port = Number(process.env.PORT ?? process.env.PARADOX_API_PORT ?? 8787);
+const host = process.env.PARADOX_API_HOST ?? "0.0.0.0";
 
 try {
   await prisma.$connect();

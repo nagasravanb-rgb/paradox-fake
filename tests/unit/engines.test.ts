@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { classifyClaimType, extractClaimsHeuristic } from "../../packages/evidence/src/claims";
 import { detectSourceRelationships } from "../../packages/evidence/src/independence";
 import { findContradictions } from "../../packages/evidence/src/contradiction";
+import { evidenceStrength } from "../../packages/evidence/src/relevance";
 import { decideVerdict } from "../../packages/verification/src/verdict";
 import { shouldSelfVerify, selfVerificationDelta } from "../../packages/verification/src/selfVerify";
 import { computeConfidence } from "../../packages/verification/src/confidence";
@@ -80,8 +81,24 @@ describe("source independence", () => {
       baseSrc("a", "https://example.com/p", "Same title"),
       baseSrc("b", "https://example.com/p", "Same title"),
     ];
-    detectSourceRelationships(sources);
+     detectSourceRelationships(sources);
     expect(sources.some((s) => s.independenceScore < 1)).toBe(true);
+  });
+});
+    describe("source relationships", () => {
+  it("keeps relationship source IDs aligned with the provided sources", () => {
+    const sources: Source[] = [
+      baseSrc("s1", "https://example.com/a", "Source A"),
+      baseSrc("s2", "https://example.org/b", "Source B"),
+    ];
+
+    const relationships = detectSourceRelationships(sources);
+    const sourceIds = new Set(sources.map((source) => source.id));
+
+    for (const relationship of relationships) {
+      expect(sourceIds.has(relationship.fromSourceId)).toBe(true);
+      expect(sourceIds.has(relationship.toSourceId)).toBe(true);
+    }
   });
 });
 
@@ -132,7 +149,55 @@ describe("self-verification", () => {
     expect(selfVerificationDelta(0.4, 0.6)).toBe(0.2);
   });
 });
+describe("evidence strength", () => {
+  it("does not let irrelevant evidence dilute or inflate strong relevant evidence", () => {
+    const strong = ev({
+      id: "e1",
+      sourceId: "s1",
+      extractedText: "The Earth is the third planet from the Sun.",
+      relevanceScore: 1,
+      supportScore: 1,
+      sourceReliability: 1,
+      independenceScore: 1,
+    });
 
+    const irrelevant = [
+      ev({
+        id: "e2",
+        sourceId: "s2",
+        extractedText: "Escape from Planet Earth is an animated film.",
+        relevanceScore: 0.02,
+        supportScore: 0,
+        sourceReliability: 1,
+        independenceScore: 1,
+      }),
+      ev({
+        id: "e3",
+        sourceId: "s3",
+        extractedText: "Kepler's laws describe planetary motion.",
+        relevanceScore: 0.05,
+        supportScore: 0,
+        sourceReliability: 1,
+        independenceScore: 1,
+      }),
+      ev({
+        id: "e4",
+        sourceId: "s4",
+        extractedText: "The IAU defines astronomical terminology.",
+        relevanceScore: 0.03,
+        supportScore: 0,
+        sourceReliability: 1,
+        independenceScore: 1,
+      }),
+    ];
+
+    const strongOnly = evidenceStrength([strong]);
+    const withIrrelevant = evidenceStrength([strong, ...irrelevant]);
+
+    expect(strongOnly).toBeCloseTo(0.8,10);
+    expect(withIrrelevant).toBeCloseTo(strongOnly, 10);
+  });
+});
 describe("confidence", () => {
   it("keeps model confidence separate and calibrated null", () => {
     const c = computeConfidence({
