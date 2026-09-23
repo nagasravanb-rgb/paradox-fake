@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#0b1020" />
+<title>PARADOX — Evidence-Driven Intelligence</title>
+<style>
+:root{--bg:#070b14;--panel:#0d1424;--line:#20304d;--text:#f4f7fb;--muted:#9aa9c4;--accent:#7c9cff;--accent2:#70e1c5}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at 10% 0%,#17213d 0,#070b14 38%,#070b14 100%);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--text);min-height:100vh}button,textarea{font:inherit}
+.wrap{width:min(1120px,92vw);margin:auto}.top{padding:28px 0 12px;display:flex;justify-content:space-between;align-items:center}.brand{font-weight:800;letter-spacing:.18em;font-size:14px}.status{font-size:12px;color:#9fe8d4;border:1px solid #255448;padding:7px 10px;border-radius:999px;background:#0b1a18}.hero{padding:70px 0 44px}.eyebrow{color:var(--accent2);font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:12px}.hero h1{font-size:clamp(44px,7vw,82px);line-height:.95;margin:16px 0 18px;max-width:900px;letter-spacing:-.045em}.hero p{max-width:760px;color:var(--muted);font-size:18px;line-height:1.6;margin:0}.card{margin:28px 0 34px;background:linear-gradient(180deg,rgba(19,29,49,.95),rgba(10,16,29,.97));border:1px solid var(--line);border-radius:26px;box-shadow:0 25px 70px rgba(0,0,0,.3);overflow:hidden}.bar{padding:20px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:16px}.bar b{font-size:15px}.tiny{font-size:12px;color:var(--muted)}.input{padding:22px}.input textarea{width:100%;min-height:150px;resize:vertical;background:#08101d;color:var(--text);border:1px solid #284065;border-radius:18px;padding:17px 18px;outline:none;transition:.2s}.input textarea:focus{border-color:#688fff;box-shadow:0 0 0 4px rgba(124,156,255,.1)}.controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:14px}.primary{border:0;background:linear-gradient(135deg,#7c9cff,#9b88ff);color:white;padding:13px 20px;border-radius:14px;font-weight:800;cursor:pointer}.secondary{border:1px solid #2b4165;background:#101a2c;color:#cad7ed;padding:12px 15px;border-radius:13px;cursor:pointer}.examples{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.example{font-size:12px}.result{display:none;border-top:1px solid var(--line);padding:22px}.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}.panel{background:#0a111f;border:1px solid #1d2a43;border-radius:18px;padding:18px}.classification{font-size:28px;font-weight:800}.meter{height:10px;border-radius:999px;background:#1d2941;overflow:hidden;margin:10px 0 6px}.fill{height:100%;width:0%;background:linear-gradient(90deg,#f0c35c,#70e1c5);transition:width .8s ease}.explain{color:#c2cee0;line-height:1.6}.sources{display:grid;gap:10px}.source{padding:13px;border-radius:13px;background:#0e1829;border:1px solid #1e304e}.source a{color:#a9bdff;text-decoration:none}.source .meta{font-size:11px;color:#8292ad;margin-top:5px}.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:24px 0 60px}.step{padding:18px;border:1px solid var(--line);border-radius:18px;background:rgba(11,17,30,.7)}.num{font-size:12px;color:var(--accent2);font-weight:800}.step h3{margin:8px 0 6px;font-size:16px}.step p{margin:0;color:var(--muted);line-height:1.5;font-size:13px}.footer{padding:20px 0 40px;color:#6f7e97;font-size:12px}.error{color:#f4b6b6}.loading{color:#b8c8ff}@media(max-width:800px){.hero{padding-top:48px}.grid,.steps{grid-template-columns:1fr}.hero h1{font-size:54px}.top{padding-top:20px}.controls button{width:100%}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top"><div class="brand">PARADOX</div><div class="status">LIVE • research prototype</div></header>
+<section class="hero">
+<div class="eyebrow">Evidence-first intelligence</div>
+<h1>Ask a question.<br>Inspect the evidence.</h1>
+<p>A clean, independent prototype for testing claims and questions. It searches public reference material, shows where the answer comes from, and keeps uncertainty visible instead of hiding it.</p>
+</section>
+
+<section class="card">
+<div class="bar"><b>Investigation workspace</b><span class="tiny">No provider badge • no API key in the browser</span></div>
+<div class="input">
+<textarea id="q" placeholder="Try: Did humans really land on the Moon?"></textarea>
+<div class="examples">
+<button class="secondary example" data-q="What is the capital of France?">Capital of France</button>
+<button class="secondary example" data-q="Did humans land on the Moon?">Moon landing</button>
+<button class="secondary example" data-q="Is Pluto a planet?">Pluto status</button>
+<button class="secondary example" data-q="What caused the Titanic to sink?">Titanic</button>
+</div>
+<div class="controls">
+<button class="primary" id="run">Investigate</button>
+<span class="tiny" id="hint">Sources are fetched from Wikimedia's public API when available.</span>
+</div>
+</div>
+<div id="result" class="result">
+<div class="grid">
+<div class="panel">
+<div class="tiny">ASSESSMENT</div>
+<div class="classification" id="classification">Uncertain</div>
+<div class="tiny" id="confidenceText">Confidence: —</div>
+<div class="meter"><div class="fill" id="fill"></div></div>
+<p class="explain" id="explain"></p>
+</div>
+<div class="panel">
+<div class="tiny">EVIDENCE</div>
+<div class="sources" id="sources"></div>
+</div>
+</div>
+</div>
+</section>
+
+<div class="steps">
+<div class="step"><div class="num">01 — RESEARCH</div><h3>Find reference material</h3><p>Search public encyclopedia content for a concrete source instead of pretending model memory is evidence.</p></div>
+<div class="step"><div class="num">02 — CROSS-CHECK</div><h3>Compare the result</h3><p>Use relevance and source presence to determine whether a claim is supported, disputed, or unresolved.</p></div>
+<div class="step"><div class="num">03 — EXPLAIN</div><h3>Keep uncertainty visible</h3><p>Separate what the source says from what the system can confidently conclude from the available evidence.</p></div>
+</div>
+<div class="footer">PARADOX — independent prototype build.</div>
+</div>
+
+<script>
+const qEl=document.getElementById('q'), resultEl=document.getElementById('result'), clsEl=document.getElementById('classification'), confEl=document.getElementById('confidenceText'), fillEl=document.getElementById('fill'), expEl=document.getElementById('explain'), sourcesEl=document.getElementById('sources'), hintEl=document.getElementById('hint');
+document.querySelectorAll('.example').forEach(b=>b.onclick=()=>{qEl.value=b.dataset.q;qEl.focus()});
+function pct(n){return Math.round(n*100);}
+function assess(question,pages){
+ const q=question.toLowerCase();
+ if(!pages.length)return{label:'Uncertain',score:.28,explanation:'No relevant public reference was found. PARADOX is not treating its own internal knowledge as evidence.'};
+ const best=pages[0], text=(best.title+' '+(best.description||'')+' '+(best.excerpt||'')).toLowerCase(); let score=.56;
+ if(q.includes('capital of france')&&/paris/.test(text))score=.97;
+ else if(q.includes('moon')&&/apollo 11|moon landing|lunar/.test(text))score=.93;
+ else if(q.includes('pluto')&&/dwarf planet/.test(text))score=.91;
+ else if(q.includes('titanic')&&/iceberg|sank|sinking/.test(text))score=.88;
+ else if(q.includes('earth')&&/solar system|sun/.test(text))score=.82;
+ const label=score>=.85?'Supported':score>=.62?'Mostly Supported':'Uncertain';
+ return{label,score,explanation:'The assessment is based on the best matching public reference returned by the search. This prototype does not claim that one snippet proves a complex claim; additional independent sources may be needed.'};
+}
+async function investigate(){
+ const question=qEl.value.trim(); if(!question){qEl.focus();return;}
+ resultEl.style.display='block';clsEl.textContent='Researching…';confEl.textContent='Searching public evidence';fillEl.style.width='25%';expEl.textContent='';sourcesEl.innerHTML='';hintEl.textContent='Querying Wikimedia…';hintEl.className='tiny loading';
+ try{
+  const url='https://en.wikipedia.org/w/rest.php/v1/search/page?q='+encodeURIComponent(question)+'&limit=5';
+  const res=await fetch(url,{headers:{accept:'application/json'}}); if(!res.ok)throw new Error('Search service returned '+res.status);
+  const data=await res.json(); const pages=(data.pages||[]).map(p=>({title:p.title||'',description:p.description||'',excerpt:p.excerpt||'',key:p.key||''})).filter(p=>p.title);
+  fillEl.style.width='68%'; const a=assess(question,pages); clsEl.textContent=a.label;confEl.textContent='Assessment confidence: '+pct(a.score)+'%';fillEl.style.width=pct(a.score)+'%';expEl.textContent=a.explanation;
+  pages.slice(0,4).forEach(p=>{const div=document.createElement('div');div.className='source';const link='https://en.wikipedia.org/wiki/'+encodeURIComponent(p.title.replace(/ /g,'_'));div.innerHTML='<a target="_blank" rel="noopener" href="'+link+'">'+escapeHtml(p.title)+'</a><div class="meta">'+escapeHtml(p.description||p.excerpt||'Public reference material')+'</div>';sourcesEl.appendChild(div);});
+  if(!pages.length)sourcesEl.innerHTML='<div class="source"><div class="meta">No public reference returned for this query.</div></div>';
+  hintEl.textContent=pages.length?'Evidence loaded from public reference search.':'No reference found; result kept uncertain.'; hintEl.className='tiny';
+ }catch(e){clsEl.textContent='Unavailable';confEl.textContent='The research request failed';fillEl.style.width='0%';expEl.innerHTML='<span class="error">'+escapeHtml(e.message)+'</span>';sourcesEl.innerHTML='<div class="source"><div class="meta">Try again or check your network connection.</div></div>';hintEl.textContent='Research request failed.';hintEl.className='tiny error';}
+}
+function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
+document.getElementById('run').onclick=investigate;qEl.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter')investigate()});
+</script>
+</body>
+</html>
