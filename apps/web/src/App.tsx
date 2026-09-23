@@ -97,7 +97,7 @@ function getConfidence(result: unknown) {
     "confidenceRecord.finalSystemConfidence",
     "finalSystemConfidence",
     "recommendationConfidence",
-  ]);
+  ]));
 }
 
 function getClaims(result: unknown) {
